@@ -91,26 +91,37 @@ export async function runStableAPIConnect() {
 
         //Get User/users
         app.get("/api/users", async (req: Request, res: Response) => {
-            const { id } = req.query;
+            try {
+                const { id } = req.query;
 
-            if (typeof id === "string") {
-                const result = await usersCollection.findOne({
-                    _id: new ObjectId(id),
-                });
-
-                if (!result) {
-                    return res.status(404).send({
-                        message: "User not found",
+                if (typeof id === "string") {
+                    const result = await usersCollection.findOne({
+                        _id: new ObjectId(id),
                     });
+
+                    if (!result) {
+                        return res.status(404).send({
+                            message: "User not found",
+                        });
+                    }
+
+                    return res.send(result);
                 }
 
-                return res.send(result);
+                const result = await usersCollection.find().toArray();
+                const totalUsers = await usersCollection.countDocuments();
+
+                res.send({ totalUsers, result });
+            } catch (error) {
+                console.error("USERS API ERROR:", error);
+
+                res.status(500).send({
+                    message:
+                        error instanceof Error
+                            ? error.message
+                            : "Internal Server Error",
+                });
             }
-
-            const result = await usersCollection.find().toArray();
-            const totalUsers = await usersCollection.countDocuments();
-
-            res.send({ totalUsers, result });
         });
 
         //Add Movie
