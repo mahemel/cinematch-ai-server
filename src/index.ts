@@ -58,6 +58,7 @@ interface MovieDocument {
 
 export async function runStableAPIConnect() {
     try {
+        await client.connect();
         const database = client.db(DB);
         const usersCollection = database.collection("user");
         const movieCollection = database.collection("movies");
