@@ -126,166 +126,166 @@ export async function runStableAPIConnect() {
         });
 
         //Add Movie
-        // app.post(
-        //     "/api/add/movie",
-        //     verifyToken,
-        //     async (req: Request, res: Response) => {
-        //         const data = req.body;
-        //         const movie = {
-        //             ...data,
-        //             createdAdd: new Date(),
-        //         };
+        app.post(
+            "/api/add/movie",
+            verifyToken,
+            async (req: Request, res: Response) => {
+                const data = req.body;
+                const movie = {
+                    ...data,
+                    createdAdd: new Date(),
+                };
 
-        //         const result = await movieCollection.insertOne(movie);
-        //         res.send(result);
-        //     },
-        // );
+                const result = await movieCollection.insertOne(movie);
+                res.send(result);
+            },
+        );
 
-        // app.get("/api/movies", async (req: Request, res: Response) => {
-        //     const { id } = req.query;
+        app.get("/api/movies", async (req: Request, res: Response) => {
+            const { id } = req.query;
 
-        //     if (typeof id === "string") {
-        //         const result = await movieCollection.findOne({
-        //             _id: new ObjectId(id),
-        //         });
+            if (typeof id === "string") {
+                const result = await movieCollection.findOne({
+                    _id: new ObjectId(id),
+                });
 
-        //         if (!result) {
-        //             return res.status(404).send({
-        //                 message: "Item not found",
-        //             });
-        //         }
+                if (!result) {
+                    return res.status(404).send({
+                        message: "Item not found",
+                    });
+                }
 
-        //         return res.send(result);
-        //     }
+                return res.send(result);
+            }
 
-        //     const result = await movieCollection.find().toArray();
+            const result = await movieCollection.find().toArray();
 
-        //     res.send(result);
-        // });
+            res.send(result);
+        });
 
-        // app.get(
-        //     "/api/users/movies/:userId",
-        //     async (req: Request, res: Response) => {
-        //         const { userId } = req.params;
+        app.get(
+            "/api/users/movies/:userId",
+            async (req: Request, res: Response) => {
+                const { userId } = req.params;
 
-        //         const query = { addedBy: userId };
-        //         console.log(query);
+                const query = { addedBy: userId };
+                console.log(query);
 
-        //         const total = await moviesCollection.countDocuments(query);
+                const total = await moviesCollection.countDocuments(query);
 
-        //         const movies = await moviesCollection
-        //             .find(query)
-        //             .sort({ createdAdd: -1 })
-        //             .toArray();
+                const movies = await moviesCollection
+                    .find(query)
+                    .sort({ createdAdd: -1 })
+                    .toArray();
 
-        //         res.send({
-        //             total,
-        //             movies,
-        //         });
-        //     },
-        // );
+                res.send({
+                    total,
+                    movies,
+                });
+            },
+        );
 
-        // app.get("/api/filter/movies", async (req: Request, res: Response) => {
-        //     try {
-        //         const query: Filter<MovieDocument> = {};
-        //         const sort: Record<string, 1 | -1> = {};
+        app.get("/api/filter/movies", async (req: Request, res: Response) => {
+            try {
+                const query: Filter<MovieDocument> = {};
+                const sort: Record<string, 1 | -1> = {};
 
-        //         const search = req.query.search as string | undefined;
-        //         const genres = req.query.genres as string | undefined;
-        //         const sortBy = req.query.sortBy as string | undefined;
+                const search = req.query.search as string | undefined;
+                const genres = req.query.genres as string | undefined;
+                const sortBy = req.query.sortBy as string | undefined;
 
-        //         if (search) {
-        //             query.$or = [
-        //                 {
-        //                     title: {
-        //                         $regex: search,
-        //                         $options: "i",
-        //                     },
-        //                 },
-        //                 {
-        //                     genres: {
-        //                         $regex: search,
-        //                         $options: "i",
-        //                     },
-        //                 },
-        //             ];
-        //         }
-        //         if (genres) {
-        //             query.genres = {
-        //                 $regex: `^${genres}$`,
-        //                 $options: "i",
-        //             };
-        //         }
+                if (search) {
+                    query.$or = [
+                        {
+                            title: {
+                                $regex: search,
+                                $options: "i",
+                            },
+                        },
+                        {
+                            genres: {
+                                $regex: search,
+                                $options: "i",
+                            },
+                        },
+                    ];
+                }
+                if (genres) {
+                    query.genres = {
+                        $regex: `^${genres}$`,
+                        $options: "i",
+                    };
+                }
 
-        //         switch (sortBy) {
-        //             case "rating-desc":
-        //                 sort.rating = -1;
-        //                 break;
+                switch (sortBy) {
+                    case "rating-desc":
+                        sort.rating = -1;
+                        break;
 
-        //             case "rating-asc":
-        //                 sort.rating = 1;
-        //                 break;
+                    case "rating-asc":
+                        sort.rating = 1;
+                        break;
 
-        //             case "year-desc":
-        //                 sort.year = -1;
-        //                 break;
+                    case "year-desc":
+                        sort.year = -1;
+                        break;
 
-        //             case "year-asc":
-        //                 sort.year = 1;
-        //                 break;
+                    case "year-asc":
+                        sort.year = 1;
+                        break;
 
-        //             case "title-asc":
-        //                 sort.title = 1;
-        //                 break;
+                    case "title-asc":
+                        sort.title = 1;
+                        break;
 
-        //             case "title-desc":
-        //                 sort.title = -1;
-        //                 break;
+                    case "title-desc":
+                        sort.title = -1;
+                        break;
 
-        //             default:
-        //                 sort.year = -1;
-        //         }
+                    default:
+                        sort.year = -1;
+                }
 
-        //         const page = Number(req.query.page) || 1;
-        //         const perPage = Number(req.query.perPage) || 8;
+                const page = Number(req.query.page) || 1;
+                const perPage = Number(req.query.perPage) || 8;
 
-        //         const total = await moviesCollection.countDocuments(query);
+                const total = await moviesCollection.countDocuments(query);
 
-        //         const movies = await moviesCollection
-        //             .find(query)
-        //             .sort(sort)
-        //             .skip((page - 1) * perPage)
-        //             .limit(perPage)
-        //             .toArray();
+                const movies = await moviesCollection
+                    .find(query)
+                    .sort(sort)
+                    .skip((page - 1) * perPage)
+                    .limit(perPage)
+                    .toArray();
 
-        //         res.send({
-        //             total,
-        //             currentPage: page,
-        //             perPage,
-        //             totalPages: Math.ceil(total / perPage),
-        //             movies,
-        //         });
-        //     } catch (error) {
-        //         console.error(error);
-        //         res.status(500).send({ message: "Server error" });
-        //     }
-        // });
+                res.send({
+                    total,
+                    currentPage: page,
+                    perPage,
+                    totalPages: Math.ceil(total / perPage),
+                    movies,
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({ message: "Server error" });
+            }
+        });
 
-        // app.delete(
-        //     "/api/movies/:id",
-        //     verifyToken,
-        //     async (req: Request<{ id: string }>, res: Response) => {
-        //         const { id } = req.params;
+        app.delete(
+            "/api/movies/:id",
+            verifyToken,
+            async (req: Request<{ id: string }>, res: Response) => {
+                const { id } = req.params;
 
-        //         const query: Filter<MovieDocument> = {
-        //             _id: new ObjectId(id),
-        //         };
+                const query: Filter<MovieDocument> = {
+                    _id: new ObjectId(id),
+                };
 
-        //         const result = await moviesCollection.deleteOne(query);
+                const result = await moviesCollection.deleteOne(query);
 
-        //         res.send(result);
-        //     },
-        // );
+                res.send(result);
+            },
+        );
     } finally {
         // await client.close();
     }
