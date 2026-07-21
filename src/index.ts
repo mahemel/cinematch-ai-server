@@ -30,6 +30,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 const uri = process.env.MONGODB_URI;
 const DB = process.env.MONGODB_NAME;
+console.log(DB);
 
 if (!uri) {
     throw new Error("Please define the MONGODB_URI environment variable.");
@@ -58,6 +59,9 @@ interface MovieDocument {
 }
 export async function runStableAPIConnect() {
     try {
+        await client.connect();
+
+        console.log("MongoDB connected");
         const database = client.db(DB);
         const usersCollection = database.collection("user");
 
